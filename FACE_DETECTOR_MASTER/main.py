@@ -1,22 +1,16 @@
 import cv2
-import dlib
-import sys
-import numpy as np
+#import dlib
+#import sys
+#import numpy as np
 
-scaler = 0.3
 
-# initialize face detector and shape predictor
-detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(
-    'FACE_DETECTOR_MASTER/shape_predictor_68_face_landmarks.dat')
-
-# load video
-cap = cv2.VideoCapture('samples/girl.mp4')
-# load overlay image
+face_cascade = cv2.CascadeClassifier(
+    'FACE_DETECTOR_MASTER/haarcascade_frontalface_default.xml')
+# Read the input image
+#img = cv2.imread('test.png')
+cap = cv2.VideoCapture(0)
 overlay = cv2.imread('beauty_samples/ryan_transparent.png',
                      cv2.IMREAD_UNCHANGED)
-
-# overlay function
 
 
 def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=None):
@@ -39,8 +33,7 @@ def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=Non
                               mask=cv2.bitwise_not(mask))
     img2_fg = cv2.bitwise_and(img_to_overlay_t, img_to_overlay_t, mask=mask)
 
-    bg_img[int(y-h/2):int(y+h/2), int(x-w/2)
-               :int(x+w/2)] = cv2.add(img1_bg, img2_fg)
+    bg_img[int(y-h/2):int(y+h/2), int(x-w/2)           :int(x+w/2)] = cv2.add(img1_bg, img2_fg)
 
     # convert 4 channels to 4 channels
     bg_img = cv2.cvtColor(bg_img, cv2.COLOR_BGRA2BGR)
@@ -51,76 +44,21 @@ def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=Non
 face_roi = []
 face_sizes = []
 
-# loop
-while True:
-    # read frame buffer from video
-    ret, img = cap.read()
-    if not ret:
+
+while cap.isOpened():
+    _, img = cap.read()
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+
+    for (x, y, w, h) in faces:
+        result = overlay_transparent(
+            img, overlay, (2*x+w)/2, (2*y+h)/2, overlay_size=(int(w), int(h)))
+        cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 3)
+    # Display the output
+    cv2.imshow('img', img)
+    cv2.imshow('result', result)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    # resize frame
-    img = cv2.resize(
-        img, (int(img.shape[1] * scaler), int(img.shape[0] * scaler)))
-    ori = img.copy()
-
-    # find faces
-    if len(face_roi) == 0:
-        faces = detector(img, 1)
-    else:
-        roi_img = img[face_roi[0]:face_roi[1], face_roi[2]:face_roi[3]]
-        # cv2.imshow('roi', roi_img)
-        faces = detector(roi_img)
-
-    # no faces
-    if len(faces) == 0:
-        print('no faces!')
-
-    # find facial landmarks
-    for face in faces:
-        if len(face_roi) == 0:
-            dlib_shape = predictor(img, face)
-            shape_2d = np.array([[p.x, p.y] for p in dlib_shape.parts()])
-        else:
-            dlib_shape = predictor(roi_img, face)
-            shape_2d = np.array([[p.x + face_roi[2], p.y + face_roi[0]]
-                                for p in dlib_shape.parts()])
-
-        for s in shape_2d:
-            cv2.circle(img, center=tuple(s), radius=1, color=(
-                255, 255, 255), thickness=2, lineType=cv2.LINE_AA)
-
-        # compute face center
-        center_x, center_y = np.mean(shape_2d, axis=0).astype(np.int)
-
-        # compute face boundaries
-        min_coords = np.min(shape_2d, axis=0)
-        max_coords = np.max(shape_2d, axis=0)
-
-        # draw min, max coords
-        cv2.circle(img, center=tuple(min_coords), radius=1, color=(
-            255, 0, 0), thickness=2, lineType=cv2.LINE_AA)
-        cv2.circle(img, center=tuple(max_coords), radius=1, color=(
-            255, 0, 0), thickness=2, lineType=cv2.LINE_AA)
-
-        # compute face size
-        face_size = max(max_coords - min_coords)
-        face_sizes.append(face_size)
-        if len(face_sizes) > 10:
-            del face_sizes[0]
-        mean_face_size = int(np.mean(face_sizes) * 1.8)
-
-        # compute face roi
-        face_roi = np.array([int(min_coords[1] - face_size / 2), int(max_coords[1] + face_size / 2),
-                            int(min_coords[0] - face_size / 2), int(max_coords[0] + face_size / 2)])
-        face_roi = np.clip(face_roi, 0, 10000)
-
-        # draw overlay on face
-        result = overlay_transparent(
-            ori, overlay, center_x + 8, center_y - 25, overlay_size=(mean_face_size, mean_face_size))
-
-    # visualize
-    cv2.imshow('original', ori)
-    cv2.imshow('facial landmarks', img)
-    cv2.imshow('result', result)
-    if cv2.waitKey(1) == ord('q'):
-        sys.exit(1)
+cap.release()
