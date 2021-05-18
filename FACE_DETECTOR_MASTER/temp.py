@@ -13,7 +13,7 @@ predictor = dlib.shape_predictor(
 # load video
 cap = cv2.VideoCapture('samples/girl.mp4')
 # load overlay image
-overlay = cv2.imread('beauty_samples/ryan_transparent.png',
+overlay = cv2.imread('beauty_samples/heavy_mask.png',
                      cv2.IMREAD_UNCHANGED)
 
 # overlay function
