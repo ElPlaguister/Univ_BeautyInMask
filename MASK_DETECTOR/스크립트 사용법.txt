@@ -1,0 +1,14 @@
+학습이 되어 있는지 모름
+
+1. 먼저 cmd창에서 MASK_DETECTOR 디렉토리로 이동
+2. python3 detect_mask_image.py --image images/pic1 실행
+3. 1분 내에 실행되지 않을 경우 
+	a. pip3 install -r requirements.txt
+	b. python3 train_mask_detector.py --dataset dataset
+	c. python3 detect_mask_image.py --image images/pic1.jpeg
+잘 안될 경우 연락바랍니다.
+
+구현 부분: detect_mask_image.py 내부에 get_mask_prob함수
+인자 값: 인식 배열 (수정 불가), index (인식 배열에 종속된 순서 값), confThres (나중에 고정 값으로 수정할 것임), image (cv2로 읽어온 이미지), model (사용한 모델, 고정 값으로 수정할 것임)
+반환 값: startX, Y, end X, Y: 얼굴 위치, mask: 마스크를 낀 얼굴일 가능도, withoutMask: 마스크를 안 낀 얼굴일 가능도
+-> 반환 값이 전부 -1이라면 얼굴이 아닌 것임 (예외처리 추가할 것임)
