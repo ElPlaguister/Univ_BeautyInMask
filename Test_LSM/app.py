@@ -15,7 +15,9 @@ from PyQt5.QtGui import QIcon
 
 overlay_mask = cv2.imread("set_up/filter/default.png", cv2.IMREAD_UNCHANGED)
 overlay_nonMask = cv2.imread("set_up/filter/default.png", cv2.IMREAD_UNCHANGED)
+
 test_mode = True
+filter_scale = 1
 
 def get_img_path(index = 0, maskMode = False, imtype = 'png'):
     mask_keyword = "mask" if maskMode else "non_mask"
@@ -216,7 +218,6 @@ if __name__ == "__main__":
             
             overlay = overlay_mask if isMask else overlay_nonMask
 
-            filter_scale = 1
             filter_size = int((endX-startX)* filter_scale)
             frame = overlay_transparent(frame, overlay, (startX+endX)/2, (startY+endY)/2, overlay_size=(filter_size, filter_size))
             
