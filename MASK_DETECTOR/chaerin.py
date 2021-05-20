@@ -26,35 +26,40 @@ scaler = 1
 result = 0
 overlay = cv2.imread('samples/1.png',
                      cv2.IMREAD_UNCHANGED)
-previous_mask_status = True
+previous_mask_status = True  # 마스크를 썼는지 아닌지
+filter_num = 0
 
 
 def button0_clicked():  # non-filter
-    global overlay
-
+    global overlay, filter_num
+    filter_num = 0
     overlay = cv2.imread('samples/0.png', cv2.IMREAD_UNCHANGED)
 
 
 def button1_clicked():
-    global overlay
+    global overlay, filter_num
+    filter_num = 1
 
     overlay = cv2.imread('samples/1.png', cv2.IMREAD_UNCHANGED)
 
 
 def button2_clicked():
-    global overlay
+    global overlay, filter_num
+    filter_num = 2
 
     overlay = cv2.imread('samples/2.png', cv2.IMREAD_UNCHANGED)
 
 
 def button3_clicked():
-    global overlay
+    global overlay, filter_num
+    filter_num = 3
 
     overlay = cv2.imread('samples/3.png', cv2.IMREAD_UNCHANGED)
 
 
 def button4_clicked():
-    global overlay
+    global overlay, filter_num
+    filter_num = 4
 
     overlay = cv2.imread('samples/4.png', cv2.IMREAD_UNCHANGED)
 
@@ -141,7 +146,7 @@ def overlay_transparent(background_img, img_to_overlay_t, x, y, overlay_size=Non
                               mask=cv2.bitwise_not(mask))
     img2_fg = cv2.bitwise_and(img_to_overlay_t, img_to_overlay_t, mask=mask)
 
-    bg_img[int(y-h/2):int(y+h/2), int(x-w/2)           :int(x+w/2)] = cv2.add(img1_bg, img2_fg)
+    bg_img[int(y-h/2):int(y+h/2), int(x-w/2):int(x+w/2)] = cv2.add(img1_bg, img2_fg)
 
     # convert 4 channels to 4 channels
     bg_img = cv2.cvtColor(bg_img, cv2.COLOR_BGRA2BGR)
@@ -268,12 +273,14 @@ while True:
         label = "Mask" if mask > withoutMask else "No Mask"
         color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
 
-        if label == "Mask" and previous_mask_status == False:
+        if filter_num == 4 and label == "Mask" and previous_mask_status == False:
             print("마스크 썼으니 필터바꿔")
+            filter_num = 3
             overlay = cv2.imread('samples/3.png', cv2.IMREAD_UNCHANGED)
 
-        elif label == "No Mask" and previous_mask_status == True:
+        elif filter_num == 3 and label == "No Mask" and previous_mask_status == True:
             print("마스크 벗었으니 필터 바꿔")
+            filter_num = 4
             overlay = cv2.imread('samples/4.png', cv2.IMREAD_UNCHANGED)
 
     # 전 프레임의 마스크 상황
