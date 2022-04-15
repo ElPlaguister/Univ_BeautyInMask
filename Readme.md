@@ -20,3 +20,9 @@
 ## 참고한 오픈 소스
 
 - https://github.com/kairess/face_detector
+
+## 발표
+### 중간 발표
+- https://youtu.be/iHmclttEc7U
+### 최종 발표
+- https://youtu.be/IOt-ZtajvGU
