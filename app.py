@@ -17,7 +17,7 @@ overlay_mask = cv2.imread("set_up/filter/default.png", cv2.IMREAD_UNCHANGED)
 overlay_nonMask = cv2.imread("set_up/filter/default.png", cv2.IMREAD_UNCHANGED)
 
 test_mode = True
-filter_scale = 1
+filter_scale = 2
 
 def get_img_path(index = 0, maskMode = False, imtype = 'png'):
     mask_keyword = "mask" if maskMode else "non_mask"
@@ -203,6 +203,8 @@ if __name__ == "__main__":
     print("[INFO] starting video stream...")
     vs = VideoStream(src=0).start()
     time.sleep(2.0)
+
+    buttons[-1].myClick()
     
     # 실시간 비디오의 각 프레임마다 처리하는 부분입니다.
     while True:
@@ -245,6 +247,3 @@ if __name__ == "__main__":
 
         if key == ord("q"):
             exit()
-
-
-
